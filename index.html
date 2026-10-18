@@ -1,0 +1,1028 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Quizário</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: barra superior + área de trabalho em três colunas no editor (etapas | campos | celular), uma coluna no telefone */
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --sunk:#E3E9E7; --line:#CCD6D3;
+  --ink:#0F2E33; --muted:#557074; --accent:#E2541B; --accent-ink:#FFFFFF;
+  --teal:#1D6F6A; --good:#2F8A4E; --warn:#B7791F; --bad:#C2372B;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1A1C; --surface:#12262A; --sunk:#0E2023; --line:#24413F;
+  --ink:#E4EEEC; --muted:#8FA9A8; --accent:#FF7340; --accent-ink:#1A0A03;
+  --teal:#5BC2B8; --good:#5FC283; --warn:#E3AE55; --bad:#F07A6C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1A1C; --surface:#12262A; --sunk:#0E2023; --line:#24413F;
+  --ink:#E4EEEC; --muted:#8FA9A8; --accent:#FF7340; --accent-ink:#1A0A03;
+  --teal:#5BC2B8; --good:#5FC283; --warn:#E3AE55; --bad:#F07A6C; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1320px;margin:0 auto}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:16px;padding-block:10px;flex-wrap:wrap}
+.logo{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo i{width:22px;height:22px;border-radius:50% 50% 50% 4px;background:var(--accent);display:inline-block}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{border:0;background:none;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:600}
+nav.tabs button[aria-current="true"]{background:var(--sunk);color:var(--ink)}
+.spacer{flex:1}
+.mode{font:12px var(--f-mono);color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{border-color:transparent;background:none}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+main{padding-block:24px 64px}
+.eyebrow{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+label.f{display:grid;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+label.f input,label.f textarea,label.f select,.in{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--ink);font-weight:400;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+
+/* Gerador */
+.gen{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.gen{grid-template-columns:1fr}}
+.gen-box{padding:24px;display:grid;gap:14px}
+.gen h1{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-.025em}
+.gen h1 em{font-style:normal;color:var(--accent)}
+.status{font:13px var(--f-mono);color:var(--teal);min-height:1.5em;white-space:pre-wrap}
+.err{color:var(--bad);font-size:14px}
+
+/* Lista de funis */
+.flist{display:grid;gap:10px}
+.frow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px}
+.dot{width:14px;height:14px;border-radius:50%}
+.frow h3{font-size:17px}
+.kpis{display:flex;gap:18px;font:13px var(--f-mono);color:var(--muted);flex-wrap:wrap}
+.kpis b{color:var(--ink);font-weight:600}
+.chip{display:inline-block;font:600 11px var(--f-mono);padding:2px 7px;border-radius:99px;background:var(--sunk);color:var(--muted);letter-spacing:.04em}
+.chip.ab{background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal)}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.frow{grid-template-columns:auto minmax(0,1fr)}.row-actions{grid-column:1/-1;justify-content:flex-start}}
+.empty{padding:28px;text-align:left;display:grid;gap:10px;border-style:dashed}
+
+/* Editor */
+.ed-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.ed-head h2{font-size:24px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.editor{display:grid;grid-template-columns:260px minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:1100px){.editor{grid-template-columns:240px minmax(0,1fr)}.phone-col{grid-column:1/-1;justify-self:center}}
+@media (max-width:700px){.editor{grid-template-columns:1fr}}
+.steps{padding:8px;display:grid;gap:4px}
+.step{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent;background:none;text-align:left;width:100%}
+.step:hover{background:var(--sunk)}
+.step[aria-selected="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.step .n{font:600 12px var(--f-mono);color:var(--muted);text-align:center}
+.step .t{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step .k{font:10px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block}
+.step .mv{display:flex;gap:2px;opacity:.5}
+.step:hover .mv{opacity:1}
+.mv button{border:0;background:none;cursor:pointer;padding:2px 4px;color:var(--muted);font-size:12px}
+.add-step{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line);flex-wrap:wrap}
+.panel{padding:18px;display:grid;gap:14px}
+.panel h3{font-size:16px}
+.opts{display:grid;gap:6px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.subtabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+.subtabs button{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.subtabs button[aria-current="true"]{color:var(--ink);border-color:var(--accent)}
+.list-edit{display:grid;gap:6px}
+.research{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+/* Celular */
+.phone{width:320px;max-width:100%;aspect-ratio:9/18.5;border-radius:36px;border:10px solid var(--ink);background:#fff;overflow:hidden;position:relative;box-shadow:0 18px 40px -20px rgba(0,0,0,.4)}
+.phone-col{display:grid;gap:8px;justify-items:center;position:sticky;top:80px}
+.phone .screen{position:absolute;inset:0;overflow:auto}
+
+/* Quiz renderizado (usa a cor da marca do funil, sempre claro como página pública) */
+.qz{--b:#E2541B;min-height:100%;background:#FAFAF7;color:#1B1B1B;font:15px/1.45 var(--f-body);display:flex;flex-direction:column;color-scheme:light}
+.qz .bar{height:5px;background:#E6E6E0}
+.qz .bar i{display:block;height:100%;background:var(--b);transition:width .3s}
+.qz .brand{padding:12px 18px 0;font:700 13px var(--f-display);color:var(--b);letter-spacing:.02em}
+.qz .body{padding:16px 18px 22px;display:flex;flex-direction:column;gap:12px;flex:1}
+.qz h2{font:800 22px/1.15 var(--f-display);color:#111;letter-spacing:-.01em}
+.qz p{margin:0;color:#4A4A45}
+.qz .o{display:block;width:100%;text-align:left;padding:13px 14px;border:1.5px solid #DADAD2;border-radius:12px;background:#fff;cursor:pointer;font-weight:500;color:#1B1B1B}
+.qz .o:hover{border-color:var(--b)}
+.qz .o.on{border-color:var(--b);background:color-mix(in srgb,var(--b) 10%,#fff)}
+.qz .cta{margin-top:auto;padding:14px;border:0;border-radius:12px;background:var(--b);color:#fff;font:700 16px var(--f-body);cursor:pointer;width:100%}
+.qz .cta:disabled{opacity:.45}
+.qz input{width:100%;padding:12px;border:1.5px solid #DADAD2;border-radius:10px;background:#fff;color:#111}
+.qz .proof{display:grid;gap:6px;padding:0;margin:0;list-style:none}
+.qz .proof li{padding:8px 10px;background:#fff;border-radius:8px;border:1px solid #EAEAE3;font-size:14px}
+.qz .proof li::before{content:"✓ ";color:var(--b);font-weight:700}
+.qz .price{display:flex;align-items:baseline;gap:8px}
+.qz .price s{color:#999}
+.qz .price b{font:800 28px var(--f-display);color:#111}
+.qz .mech{padding:10px 12px;border-left:3px solid var(--b);background:#fff;font-size:14px}
+.qz .spin{width:40px;height:40px;border-radius:50%;border:4px solid #E6E6E0;border-top-color:var(--b);animation:sp 1s linear infinite;margin:30px auto 0}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.qz .spin{animation:none}}
+.qz .tiny{font-size:12px;color:#777}
+
+/* Modo publicação (tela cheia) */
+.play{position:fixed;inset:0;z-index:50;background:#FAFAF7;overflow:auto;padding-top:env(safe-area-inset-top,0px)}
+.play .qz{max-width:480px;margin:0 auto;min-height:100vh}
+.play-close{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));z-index:51;background:#fff;border:1px solid #ddd;color:#333;border-radius:99px;padding:6px 12px;cursor:pointer;font-size:13px}
+
+/* Métricas */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-block:16px}
+.kpi{padding:14px 16px}
+.kpi .v{font:700 28px var(--f-display);font-variant-numeric:tabular-nums}
+.kpi .l{font-size:13px;color:var(--muted)}
+.chart{padding:18px;overflow-x:auto}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.t th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+table.t td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
+.tbl{overflow-x:auto}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:60;font-size:14px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:grid;place-items:center;padding:16px}
+.modal{max-width:560px;width:100%;padding:20px;display:grid;gap:12px;max-height:90vh;overflow:auto}
+.modal.wide{max-width:780px}
+.aip{border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.aip>summary{cursor:pointer;padding:10px 12px;display:flex;align-items:center;gap:8px;font-weight:600;list-style:none}
+.aip>summary::-webkit-details-marker{display:none}
+.aip>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+.aip[open]>summary::before{transform:rotate(90deg)}
+.aip .aib{padding:0 12px 12px;display:grid;gap:10px}
+.aip .aib label.f input{background:var(--surface)}
+.chip.ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.chip.on{background:var(--accent);color:var(--accent-ink)}
+.ai-st{font:12px var(--f-mono);white-space:pre-wrap;min-height:1.2em}
+.ai-st.ok{color:var(--good)} .ai-st.bad{color:var(--bad)}
+.ai-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+code.k{font-family:var(--f-mono);background:var(--sunk);padding:2px 6px;border-radius:5px;font-size:13px;word-break:break-all}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="logo"><i></i>Quizário</div>
+  <nav class="tabs" id="tabs">
+    <button data-v="criar">Criar</button>
+    <button data-v="funis">Meus funis</button>
+    <button data-v="editor">Editor</button>
+    <button data-v="metricas">Métricas</button>
+    <button data-v="leads">Leads</button>
+  </nav>
+  <div class="spacer"></div>
+  <button class="btn sm" id="aibtn" title="Configurações de IA">⚙ IA: <span id="ailbl">—</span></button>
+  <span class="mode" id="mode">conectando…</span>
+</div></header>
+
+<main class="wrap" id="app"></main>
+<div id="overlay"></div>
+
+<script>
+/* ============ Estado ============ */
+const S = {
+  view: 'criar', funnels: [], sessions: [], leads: [],
+  cur: null, variant: 'A', sel: 0, sub: 'etapas', metricFunnel: null,
+  db: null, sample: null, downloads: null, canEdit: true, mode: 'local'
+};
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = (p='') => p + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+const clone = o => JSON.parse(JSON.stringify(o));
+function toast(m){ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.append(t); setTimeout(()=>t.remove(),2600); }
+
+const TYPES = {
+  intro:{n:'Abertura'}, escolha:{n:'Pergunta única'}, multipla:{n:'Múltipla escolha'},
+  info:{n:'Informação'}, captura:{n:'Captura de lead'}, carregando:{n:'Análise'}, oferta:{n:'Oferta'}
+};
+function blank(tipo){
+  switch(tipo){
+    case 'intro': return {tipo, titulo:'Descubra em 1 minuto…', subtitulo:'Responda algumas perguntas rápidas.', botao:'Começar'};
+    case 'escolha': return {tipo, pergunta:'Nova pergunta', ajuda:'', opcoes:['Opção 1','Opção 2','Opção 3']};
+    case 'multipla': return {tipo, pergunta:'Marque tudo que se aplica', ajuda:'', opcoes:['Opção 1','Opção 2','Opção 3']};
+    case 'info': return {tipo, titulo:'Você sabia?', texto:'Texto explicativo.'};
+    case 'captura': return {tipo, titulo:'Seu resultado está pronto', texto:'Para onde enviamos?', campos:['nome','email','whatsapp']};
+    case 'carregando': return {tipo, texto:'Analisando suas respostas…'};
+    case 'oferta': return {tipo, titulo:'Seu plano recomendado', dor:'', promessa:'', provas:['[insira prova real]'], bonus:[], preco:'97', preco_de:'197', cta:'Quero agora', url:'', garantia:'7 dias de garantia'};
+  }
+}
+const stepTitle = s => s.titulo || s.pergunta || s.texto || TYPES[s.tipo]?.n;
+
+/* ============ Persistência (db compartilhado, ou navegador como alternativa) ============ */
+const LS = {
+  get(k,d){ try{ return JSON.parse(localStorage.getItem('qz_'+k)) ?? d }catch{ return d } },
+  set(k,v){ try{ localStorage.setItem('qz_'+k, JSON.stringify(v)) }catch{} }
+};
+const pending = new Map(); const writing = new Set();
+function saveFunnel(f){
+  f.atualizado = Date.now(); S._last = S.funnels;
+  if (S.mode === 'local'){ LS.set('funnels', S.funnels); return; }
+  clearTimeout(pending.get(f.id)?.t);
+  pending.set(f.id, {t: setTimeout(()=>flush(f.id), 700)});
+}
+async function flush(id){
+  if (writing.has(id)){ pending.set(id,{t:setTimeout(()=>flush(id),400)}); return; }
+  const f = S.funnels.find(x=>x.id===id); if(!f) return;
+  pending.delete(id); writing.add(id);
+  try{ await S.db.doc('funnels/'+id).set(clone(f)); }
+  catch(e){ toast(e.code==='permission_denied' ? 'Você não tem permissão para salvar funis aqui.' : 'Não foi possível salvar: '+(e.message||e.code)); }
+  finally{ writing.delete(id); }
+}
+async function removeFunnel(id){
+  S.funnels = S.funnels.filter(f=>f.id!==id);
+  if (S.mode==='local') LS.set('funnels', S.funnels);
+  else try{ await S.db.doc('funnels/'+id).delete(); }catch(e){ toast('Não foi possível excluir.'); }
+  render();
+}
+function upsertLocalFunnel(f){
+  const i = S.funnels.findIndex(x=>x.id===f.id);
+  if (i>=0) S.funnels[i]=f; else S.funnels.unshift(f);
+  saveFunnel(f);
+}
+// Sessões de visitantes: um documento por visita, atualizado a cada avanço
+const sessWrite = {busy:false, next:null};
+async function putSession(sess){
+  if (S.mode==='local'){
+    const all = LS.get('sessions', []); const i = all.findIndex(s=>s.id===sess.id);
+    if(i>=0) all[i]=sess; else all.push(sess); LS.set('sessions', all); S.sessions = all; return;
+  }
+  if (sessWrite.busy){ sessWrite.next = clone(sess); return; }
+  sessWrite.busy = true;
+  try{ await S.db.doc('sessions/'+sess.id).set(clone(sess)); }catch(e){}
+  sessWrite.busy = false;
+  if (sessWrite.next){ const n = sessWrite.next; sessWrite.next=null; putSession(n); }
+}
+async function addLead(lead){
+  if (S.mode==='local'){ const all=LS.get('leads',[]); all.push(lead); LS.set('leads',all); S.leads=all; return true; }
+  try{ await S.db.doc('leads/'+lead.id).set(lead); return true; }
+  catch(e){ if(e.code==='quota_exceeded') toast('O banco de dados está cheio. Exporte e apague leads antigos.'); return false; }
+}
+
+async function boot(){
+  render();
+  const c = window.claude;
+  if (!c?.use){ setMode('local'); loadLocal(); return; }
+  const [db, sample, downloads, user] = await Promise.all([
+    c.use('db').catch(()=>null), c.use('sample').catch(()=>null),
+    c.use('downloads').catch(()=>null), c.use('user').catch(()=>null)
+  ]);
+  S.sample = sample; S.downloads = downloads;
+  if (user){ try{ S.canEdit = await user.canEdit(); }catch{} }
+  if (db){
+    S.db = db; setMode('db');
+    db.collection('funnels').onSnapshot(snap=>{
+      const remote = snap.docs.map(d=>({...d.data(), id:d.id}));
+      // mantém a versão local do funil em edição enquanto houver gravação pendente
+      S.funnels = remote.map(r => (S.cur===r.id && (pending.has(r.id)||writing.has(r.id))) ? (S.funnels.find(f=>f.id===r.id)||r) : r)
+        .sort((a,b)=>(b.atualizado||0)-(a.atualizado||0));
+      for (const id of [...pending.keys(), ...writing]) if(!S.funnels.find(f=>f.id===id)){ const loc = S._last?.find(f=>f.id===id); if(loc) S.funnels.unshift(loc); }
+      S._last = S.funnels;
+      if (!S.metricFunnel && S.funnels[0]) S.metricFunnel = S.funnels[0].id;
+      if (!S.cur && S.funnels[0]) S.cur = S.funnels[0].id;
+      softRender();
+    }, ()=>{ setMode('local'); loadLocal(); });
+    db.collection('sessions').onSnapshot(s=>{ S.sessions = s.docs.map(d=>d.data()); softRender(); }, ()=>{});
+    db.collection('leads').onSnapshot(s=>{ S.leads = s.docs.map(d=>d.data()); softRender(); }, ()=>{});
+  } else { setMode('local'); loadLocal(); }
+  checkHash();
+}
+function loadLocal(){
+  S.funnels = LS.get('funnels', []); S.sessions = LS.get('sessions', []); S.leads = LS.get('leads', []);
+  if (S.funnels[0]){ S.cur = S.cur || S.funnels[0].id; S.metricFunnel = S.metricFunnel || S.funnels[0].id; }
+  render(); checkHash();
+}
+function setMode(m){
+  S.mode = m;
+  $('#mode').textContent = m==='db' ? '● dados compartilhados' : '● salvo só neste navegador';
+  updateAiLabel();
+}
+// re-render sem destruir o campo em foco no editor
+function softRender(){
+  const a = document.activeElement;
+  if (S.view==='editor' && a && a.closest('#app') && (a.tagName==='INPUT'||a.tagName==='TEXTAREA')) return;
+  render();
+}
+
+/* ============ Provedores de IA (chaves só no localStorage deste navegador) ============ */
+// Os modelos abaixo são sugestões iniciais; use "Listar modelos" para ver os disponíveis na sua conta.
+const AI_PROV = {
+  openai:    {n:'OpenAI (GPT)',       kind:'oai',       base:'https://api.openai.com/v1',                        model:'gpt-4o-mini',             keyUrl:'https://platform.openai.com/api-keys'},
+  anthropic: {n:'Anthropic (Claude)', kind:'anthropic', base:'https://api.anthropic.com/v1',                     model:'claude-sonnet-4-5',       keyUrl:'https://console.anthropic.com/settings/keys'},
+  gemini:    {n:'Google (Gemini)',    kind:'gemini',    base:'https://generativelanguage.googleapis.com/v1beta', model:'gemini-2.5-flash',        keyUrl:'https://aistudio.google.com/app/apikey'},
+  groq:      {n:'Groq',               kind:'oai',       base:'https://api.groq.com/openai/v1',                   model:'llama-3.3-70b-versatile', keyUrl:'https://console.groq.com/keys'},
+  deepseek:  {n:'DeepSeek',           kind:'oai',       base:'https://api.deepseek.com/v1',                      model:'deepseek-chat',           keyUrl:'https://platform.deepseek.com/api_keys'},
+  mistral:   {n:'Mistral',            kind:'oai',       base:'https://api.mistral.ai/v1',                        model:'mistral-large-latest',    keyUrl:'https://console.mistral.ai/api-keys'},
+  openrouter:{n:'OpenRouter',         kind:'oai',       base:'https://openrouter.ai/api/v1',                     model:'openai/gpt-4o-mini',      keyUrl:'https://openrouter.ai/keys'},
+  custom:    {n:'Compatível com OpenAI (outro endpoint / Ollama)', kind:'oai', base:'http://localhost:11434/v1', model:'llama3.1', keyOptional:true, editBase:true}
+};
+const AI_SYS = 'Você responde SOMENTE com JSON válido, sem texto antes ou depois e sem blocos de código.';
+const AI = {
+  cfg(){ const c = LS.get('ai', null) || {}; c.p = c.p || {}; return c; },
+  save(c){ LS.set('ai', c); updateAiLabel(); },
+  conf(id, c=AI.cfg()){ const d = AI_PROV[id]; const p = c.p[id] || {}; return {key:(p.key||'').trim(), model:(p.model||'').trim() || d.model, base:((d.editBase && p.base) ? p.base.trim() : d.base).replace(/\/+$/,'')}; },
+  ready(id, c){ if (id==='claude') return !!S.sample; const d = AI_PROV[id]; if(!d) return false; return !!(AI.conf(id,c).key || d.keyOptional && (c||AI.cfg()).p[id]?.on); },
+  active(){
+    const c = AI.cfg();
+    if (c.active && (c.active!=='claude' || S.sample)) return c.active;
+    if (S.sample) return 'claude';
+    return Object.keys(AI_PROV).find(id=>AI.ready(id,c)) || null;
+  },
+  available(){ const a = AI.active(); return !!a && AI.ready(a); },
+  label(){ const a = AI.active(); if(!a) return 'não configurada'; if(a==='claude') return 'claude.ai';
+    const n = AI_PROV[a].n.replace(/ \(.*\)$/,''); return AI.ready(a) ? `${n} · ${AI.conf(a).model}` : `${n} (sem chave)`; },
+
+  async raw(id, conf, prompt, signal){
+    const d = AI_PROV[id]; let url, headers = {'Content-Type':'application/json'}, body;
+    if (d.kind==='oai'){
+      url = conf.base + '/chat/completions';
+      if (conf.key) headers.Authorization = 'Bearer ' + conf.key;
+      if (id==='openrouter') headers['X-Title'] = 'Quizario';
+      body = {model: conf.model, messages:[{role:'system',content:AI_SYS},{role:'user',content:prompt}]};
+    } else if (d.kind==='anthropic'){
+      url = conf.base + '/messages';
+      Object.assign(headers, {'x-api-key':conf.key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true'});
+      body = {model: conf.model, max_tokens: 8192, system: AI_SYS, messages:[{role:'user',content:prompt}]};
+    } else {
+      url = `${conf.base}/models/${encodeURIComponent(conf.model.replace(/^models\//,''))}:generateContent`;
+      headers['x-goog-api-key'] = conf.key;
+      body = {systemInstruction:{parts:[{text:AI_SYS}]}, contents:[{role:'user',parts:[{text:prompt}]}], generationConfig:{responseMimeType:'application/json'}};
+    }
+    const j = await AI._fetch(d, url, {method:'POST', headers, body: JSON.stringify(body), signal});
+    let text = '';
+    if (d.kind==='oai') text = j.choices?.[0]?.message?.content || '';
+    else if (d.kind==='anthropic') text = (j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    else text = (j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+    if (!text) throw new Error(d.n + ': resposta vazia.');
+    return text;
+  },
+  async _fetch(d, url, init){
+    let r;
+    try{ r = await fetch(url, init); }
+    catch(e){ if (e.name==='AbortError') throw e;
+      throw new Error(`Sem resposta de ${d.n}. Verifique a internet e a URL base. ${d.editBase?'No Ollama, inicie com a variável OLLAMA_ORIGINS=* para aceitar chamadas do navegador.':'O provedor pode estar bloqueando chamadas diretas do navegador (CORS).'}`); }
+    const t = await r.text(); let j = {}; try{ j = JSON.parse(t) }catch{}
+    if (!r.ok){
+      const m = j.error?.message || j.message || (typeof j.error==='string'?j.error:'') || t.slice(0,200);
+      const hint = r.status===401||r.status===403 ? ' (chave inválida ou sem permissão)' : r.status===404 ? ' (modelo ou URL não encontrados)' : r.status===429 ? ' (limite de uso ou saldo esgotado)' : '';
+      const err = new Error(`${d.n}: HTTP ${r.status}${hint}. ${m}`); if (r.status===429) err.code='rate_limited'; throw err;
+    }
+    return j;
+  },
+  parse(text){
+    let s = String(text).trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+    try{ return JSON.parse(s); }catch{}
+    const a = s.search(/[\[{]/), b = Math.max(s.lastIndexOf('}'), s.lastIndexOf(']'));
+    if (a>=0 && b>a){ try{ return JSON.parse(s.slice(a,b+1)); }catch{} }
+    const e = new Error('A IA respondeu em formato inesperado.'); e.code='invalid_json'; throw e;
+  },
+  async json(prompt, {signal}={}){
+    const a = AI.active();
+    if (!a || !AI.ready(a)){ const e = new Error('Nenhuma IA configurada. Abra "⚙ IA" e informe uma chave de API.'); e.code='no_ai'; throw e; }
+    if (a==='claude') return S.sample.json(prompt, {signal, modelTier:'default', cache:false});
+    return AI.parse(await AI.raw(a, AI.conf(a), prompt, signal));
+  },
+  async models(id, conf){
+    const d = AI_PROV[id]; let url, headers = {};
+    if (d.kind==='oai'){ url = conf.base + '/models'; if (conf.key) headers.Authorization = 'Bearer ' + conf.key; }
+    else if (d.kind==='anthropic'){ url = conf.base + '/models?limit=100'; Object.assign(headers, {'x-api-key':conf.key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true'}); }
+    else { url = conf.base + '/models?pageSize=200'; headers['x-goog-api-key'] = conf.key; }
+    const j = await AI._fetch(d, url, {headers});
+    if (d.kind==='gemini') return (j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace(/^models\//,''));
+    return (j.data||j.models||[]).map(m=>m.id||m.name).filter(Boolean).sort();
+  }
+};
+function updateAiLabel(){ const el = $('#ailbl'); if (el) el.textContent = AI.label(); }
+
+function aiModal(){
+  const c = AI.cfg(), act = AI.active();
+  const opts = [...(S.sample?[['claude','IA do claude.ai (sem chave)']]:[]), ...Object.entries(AI_PROV).map(([k,v])=>[k,v.n])];
+  const card = ([id,d]) => { const p = c.p[id]||{}; const has = AI.ready(id,c);
+    return `<details class="aip" data-pid="${id}" ${id===act?'open':''}>
+      <summary><span style="flex:1">${esc(d.n)}</span>${id===act?'<span class="chip on">ativo</span>':''}<span class="chip ${has?'ok':''}" data-badge>${has?(p.key?'chave salva':'configurado'):'sem chave'}</span></summary>
+      <div class="aib">
+        ${d.editBase?`<label class="f">URL base (endpoint compatível com OpenAI)<input data-f="base" value="${esc(p.base||d.base)}" placeholder="${esc(d.base)}" spellcheck="false"></label>
+          <label style="font-size:13px"><input type="checkbox" data-f="on" ${p.on?'checked':''}> Usar sem chave (ex.: Ollama local)</label>`:''}
+        <label class="f">Chave de API${d.keyOptional?' (opcional)':''}
+          <div style="display:flex;gap:6px"><input data-f="key" type="password" value="${esc(p.key||'')}" autocomplete="off" spellcheck="false" placeholder="${d.keyOptional?'deixe vazio se não exigir':'cole sua chave aqui'}">
+          <button class="btn sm" data-eye type="button">Mostrar</button></div></label>
+        <label class="f">Modelo<input data-f="model" value="${esc(p.model||'')}" placeholder="${esc(d.model)}" list="ml-${id}" spellcheck="false"><datalist id="ml-${id}"></datalist></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn sm primary" data-test type="button">Testar conexão</button>
+          <button class="btn sm" data-list type="button">Listar modelos</button>
+          <button class="btn sm" data-use type="button" ${id===act?'disabled':''}>Usar este</button>
+          ${d.keyUrl?`<a href="${esc(d.keyUrl)}" target="_blank" rel="noopener" style="font-size:13px;color:var(--teal)">Obter chave ↗</a>`:''}
+          <div class="spacer"></div><button class="btn sm ghost danger" data-clr type="button">Apagar</button>
+        </div>
+        <div class="ai-st" data-st></div>
+      </div></details>`; };
+  modal(`<h3>Configurações de IA</h3>
+    <label class="f">Provedor ativo<select class="in" id="ai-act">${opts.map(([k,n])=>`<option value="${k}" ${k===act?'selected':''}>${esc(n)}</option>`).join('')}</select></label>
+    <p class="muted" style="margin:0;font-size:13px">Configure quantas IAs quiser e troque pelo seletor acima. As chaves ficam só neste navegador (localStorage) e <b>não</b> entram no JSON exportado, no banco compartilhado nem no link publicado. Use este app apenas em computador pessoal.</p>
+    <div style="display:grid;gap:8px">${Object.entries(AI_PROV).map(card).join('')}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-close>Concluir</button><div class="spacer"></div><button class="btn danger" id="ai-wipe">Apagar todas as chaves</button></div>`, 'wide');
+  const root = $('#overlay .modal');
+  const refresh = () => { updateAiLabel(); render(); };
+  $('#ai-act').onchange = e => { const cc = AI.cfg(); cc.active = e.target.value; AI.save(cc); refresh(); aiModal(); };
+  $('#ai-wipe').onclick = () => { if (!confirm('Apagar todas as chaves e configurações de IA deste navegador?')) return; const cc = AI.cfg(); LS.set('ai', {active: cc.active==='claude'?'claude':undefined, p:{}}); refresh(); aiModal(); };
+  root.querySelectorAll('.aip').forEach(box => {
+    const id = box.dataset.pid, st = box.querySelector('[data-st]');
+    const say = (m, cls='') => { st.textContent = m; st.className = 'ai-st ' + cls; };
+    const badge = () => { const has = AI.ready(id); const b = box.querySelector('[data-badge]'); b.className = 'chip ' + (has?'ok':''); b.textContent = has ? (AI.cfg().p[id]?.key ? 'chave salva' : 'configurado') : 'sem chave'; };
+    box.querySelectorAll('[data-f]').forEach(inp => {
+      const ev = inp.type==='checkbox' ? 'onchange' : 'oninput';
+      inp[ev] = () => { const cc = AI.cfg(); cc.p[id] = cc.p[id] || {}; cc.p[id][inp.dataset.f] = inp.type==='checkbox' ? inp.checked : inp.value;
+        if (!cc.active && AI.ready(id, cc)) cc.active = id; AI.save(cc); badge(); };
+    });
+    box.querySelector('[data-eye]').onclick = e => { const k = box.querySelector('[data-f="key"]'); k.type = k.type==='password' ? 'text' : 'password'; e.target.textContent = k.type==='password' ? 'Mostrar' : 'Ocultar'; };
+    box.querySelector('[data-use]').onclick = () => { const cc = AI.cfg(); cc.active = id; AI.save(cc); refresh(); aiModal(); };
+    box.querySelector('[data-clr]').onclick = () => { const cc = AI.cfg(); delete cc.p[id]; if (cc.active===id) delete cc.active; AI.save(cc); refresh(); aiModal(); };
+    box.querySelector('[data-test]').onclick = async e => {
+      const conf = AI.conf(id); if (!conf.key && !AI_PROV[id].keyOptional) return say('Informe a chave de API.', 'bad');
+      e.target.disabled = true; say('Testando…'); const t0 = performance.now();
+      try{ const r = AI.parse(await AI.raw(id, conf, 'Responda somente com este JSON: {"ok": true}'));
+        say(`✓ Conectado · ${conf.model} · ${((performance.now()-t0)/1000).toFixed(1)}s${r?.ok===true?'':' (respondeu, mas fora do formato esperado)'}`, 'ok'); }
+      catch(err){ say('✕ ' + (err.message || err), 'bad'); }
+      finally{ e.target.disabled = false; }
+    };
+    box.querySelector('[data-list]').onclick = async e => {
+      const conf = AI.conf(id); if (!conf.key && !AI_PROV[id].keyOptional) return say('Informe a chave de API.', 'bad');
+      e.target.disabled = true; say('Buscando modelos…');
+      try{ const ms = await AI.models(id, conf); box.querySelector('datalist').innerHTML = ms.map(m=>`<option value="${esc(m)}">`).join('');
+        say(ms.length ? `${ms.length} modelos encontrados. Clique no campo Modelo para escolher.` : 'Nenhum modelo retornado.', ms.length?'ok':'bad'); }
+      catch(err){ say('✕ ' + (err.message || err), 'bad'); }
+      finally{ e.target.disabled = false; }
+    };
+  });
+}
+const aiErr = e => e.code==='no_ai' ? e.message
+  : e.code==='not_granted' ? 'Você recusou o acesso à IA do claude.ai. Libere em Permissões do artifact ou escolha outro provedor em "⚙ IA".'
+  : e.code==='rate_limited' ? 'Limite de uso atingido. Aguarde um minuto ou troque de provedor em "⚙ IA".'
+  : e.code==='invalid_json' ? 'A IA respondeu em formato inesperado. Tente de novo ou use outro modelo.'
+  : (e.message || e.code || String(e));
+
+/* ============ Geração por IA ============ */
+const PROMPT = (prod, publico, tom) => `Você é um estrategista de funis de quiz para o mercado brasileiro.
+Crie um funil de quiz completo, em português do Brasil, para:
+PRODUTO: ${prod}
+PÚBLICO (se informado): ${publico || 'deduza a partir do produto'}
+TOM: ${tom}
+
+Passos internos: 1) pesquisa de público (persona, dores, desejos, medos, objeções); 2) mecanismo único (o ângulo que diferencia o produto, na linguagem do mercado); 3) sequência de etapas que qualifica o lead e prepara para a oferta; 4) oferta estruturada (dor, promessa, provas, chamada).
+
+Regras:
+- 8 a 12 etapas. Comece com "intro". Use 4 a 7 perguntas ("escolha" ou "multipla") com 3 a 5 opções curtas cada. Inclua 1 ou 2 etapas "info" que eduquem sobre o mecanismo. Depois "captura", depois "carregando", e termine com "oferta".
+- Mobile: textos curtos (perguntas com até 90 caracteres).
+- NÃO invente depoimentos, números de clientes, estudos ou resultados. Em "provas", escreva marcadores entre colchetes para o usuário preencher, ex.: "[depoimento real de cliente]", "[número real de alunos]", ou provas verificáveis do próprio produto (garantia, método, suporte).
+- Não faça promessas de saúde, renda ou resultado garantido.
+- "cor" é um hexadecimal adequado ao nicho.
+
+Responda SOMENTE com JSON neste formato:
+{"nome":"…","marca":"…","cor":"#RRGGBB",
+"pesquisa":{"persona":"…","dores":["…"],"desejos":["…"],"medos":["…"],"objecoes":["…"]},
+"mecanismo":{"nome":"…","explicacao":"…"},
+"etapas":[
+{"tipo":"intro","titulo":"…","subtitulo":"…","botao":"…"},
+{"tipo":"escolha","pergunta":"…","ajuda":"…","opcoes":["…","…"]},
+{"tipo":"multipla","pergunta":"…","ajuda":"…","opcoes":["…","…"]},
+{"tipo":"info","titulo":"…","texto":"…"},
+{"tipo":"captura","titulo":"…","texto":"…","campos":["nome","email","whatsapp"]},
+{"tipo":"carregando","texto":"…"},
+{"tipo":"oferta","titulo":"…","dor":"…","promessa":"…","provas":["…"],"bonus":["…"],"preco":"…","preco_de":"…","cta":"…","garantia":"…"}]}`;
+
+const CLONE_PROMPT = (txt, prod) => `Abaixo está o texto copiado de um quiz público (perguntas, opções e oferta). Extraia a ESTRUTURA (ordem e tipo das etapas, lógica de qualificação) e reescreva todo o conteúdo para o novo produto, sem copiar frases, marcas, nomes ou depoimentos do original.
+NOVO PRODUTO: ${prod}
+TEXTO DO QUIZ ORIGINAL:
+"""${txt.slice(0, 12000)}"""
+Regras: não invente depoimentos ou números; use marcadores entre colchetes. Termine com captura, carregando e oferta.
+Responda SOMENTE com JSON no mesmo formato:
+{"nome":"…","marca":"…","cor":"#RRGGBB","pesquisa":{"persona":"…","dores":[],"desejos":[],"medos":[],"objecoes":[]},"mecanismo":{"nome":"…","explicacao":"…"},"etapas":[{"tipo":"intro|escolha|multipla|info|captura|carregando|oferta", "...campos": "como no formato padrão"}]}
+Campos por tipo: intro{titulo,subtitulo,botao}; escolha/multipla{pergunta,ajuda,opcoes[]}; info{titulo,texto}; captura{titulo,texto,campos[]}; carregando{texto}; oferta{titulo,dor,promessa,provas[],bonus[],preco,preco_de,cta,garantia}.`;
+
+function normalize(raw, prod){
+  const etapas = (Array.isArray(raw?.etapas) ? raw.etapas : []).filter(e=>TYPES[e?.tipo]).map(e=>{
+    const b = blank(e.tipo); const o = {...b, ...e};
+    if (o.opcoes) o.opcoes = o.opcoes.map(String).filter(Boolean);
+    if (o.provas) o.provas = o.provas.map(String);
+    if (o.bonus) o.bonus = o.bonus.map(String);
+    return o;
+  });
+  if (!etapas.length) throw new Error('A resposta não trouxe etapas.');
+  if (!etapas.some(e=>e.tipo==='oferta')) etapas.push(blank('oferta'));
+  const cor = /^#[0-9a-f]{6}$/i.test(raw.cor||'') ? raw.cor : '#E2541B';
+  return {
+    id: uid('f'), nome: raw.nome || prod.slice(0,40), produto: prod, marca: raw.marca || raw.nome || 'Minha marca', cor,
+    pesquisa: {persona:'', dores:[], desejos:[], medos:[], objecoes:[], ...(raw.pesquisa||{})},
+    mecanismo: {nome:'', explicacao:'', ...(raw.mecanismo||{})},
+    variantes: {A: etapas, B: null}, abAtivo: false, criado: Date.now(), atualizado: Date.now()
+  };
+}
+
+let genCtl = null;
+async function generate(kind){
+  const prod = $('#g-prod').value.trim();
+  const st = $('#g-status'), er = $('#g-err'); er.textContent='';
+  if (!prod){ er.textContent = 'Descreva o produto em pelo menos uma frase.'; return; }
+  if (!AI.available()){ er.textContent = 'Nenhuma IA configurada. Informe uma chave de API em "⚙ IA" ou use "Começar em branco".'; aiModal(); return; }
+  const txt = kind==='clone' ? $('#g-clone').value.trim() : '';
+  if (kind==='clone' && txt.length < 80){ er.textContent = 'Cole o texto do quiz (perguntas e opções) para clonar a estrutura.'; return; }
+  genCtl?.abort(); genCtl = new AbortController();
+  const btns = document.querySelectorAll('.gen button'); btns.forEach(b=>b.disabled=true);
+  const t0 = Date.now(); st.textContent = 'Pesquisando público…';
+  const phases = ['Pesquisando público…','Definindo mecanismo único…','Escrevendo perguntas…','Estruturando a oferta…','Ajustando layout mobile…'];
+  let pi=0; const tick = setInterval(()=>{ pi=Math.min(pi+1,phases.length-1); st.textContent = phases[pi]+'  '+Math.round((Date.now()-t0)/1000)+'s'; }, 6000);
+  try{
+    const input = kind==='clone' ? CLONE_PROMPT(txt, prod) : PROMPT(prod, $('#g-pub').value.trim(), $('#g-tom').value);
+    const raw = await AI.json(input, {signal: genCtl.signal});
+    const f = normalize(raw, prod);
+    upsertLocalFunnel(f); S.cur = f.id; S.metricFunnel = f.id; S.variant='A'; S.sel=0; S.sub='etapas';
+    toast(`Funil gerado em ${Math.round((Date.now()-t0)/1000)}s`);
+    go('editor');
+  }catch(e){
+    if (e.name==='AbortError' || e.code==='aborted') return;
+    er.textContent = 'Não foi possível gerar: ' + aiErr(e);
+  }finally{ clearInterval(tick); st.textContent=''; btns.forEach(b=>b.disabled=false); }
+}
+function startBlank(){
+  const prod = $('#g-prod')?.value.trim() || 'Meu produto';
+  const f = normalize({nome: prod.slice(0,40), etapas:[blank('intro'),blank('escolha'),blank('escolha'),blank('info'),blank('captura'),blank('carregando'),blank('oferta')]}, prod);
+  upsertLocalFunnel(f); S.cur=f.id; S.metricFunnel=f.id; S.sel=0; go('editor');
+}
+
+/* ============ Views ============ */
+function go(v){ S.view=v; render(); window.scrollTo(0,0); }
+function curF(){ return S.funnels.find(f=>f.id===S.cur); }
+function steps(f, v=S.variant){ return (v==='B' && f.variantes.B) ? f.variantes.B : f.variantes.A; }
+
+function render(){
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-current', b.dataset.v===S.view));
+  const app = $('#app');
+  app.innerHTML = ({criar:vCriar, funis:vFunis, editor:vEditor, metricas:vMetricas, leads:vLeads}[S.view])();
+  bindView();
+}
+
+function vCriar(){
+  return `<div class="gen">
+  <section class="card gen-box">
+    <span class="eyebrow">Gerar funil com IA</span>
+    <h1>Descreva o produto. Receba o <em>funil inteiro</em>.</h1>
+    <p class="muted">Pesquisa de público, mecanismo único, perguntas, captura de lead e oferta, prontos para editar e publicar.</p>
+    <label class="f">O que você vende e para quem
+      <textarea id="g-prod" rows="3" placeholder="Ex.: Curso online de inglês para profissionais de TI que travam em reuniões com gringos">${esc(LS.get('draft',''))}</textarea></label>
+    <div class="grid2">
+      <label class="f">Público (opcional)<input id="g-pub" placeholder="Ex.: 25–40 anos, desenvolvedores"></label>
+      <label class="f">Tom<select id="g-tom"><option>Direto e próximo</option><option>Técnico e confiável</option><option>Acolhedor</option><option>Enérgico</option></select></label>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary" id="g-go">Gerar funil</button>
+      <button class="btn" id="g-blank">Começar em branco</button>
+    </div>
+    <div class="ai-bar">IA ativa: <b style="color:var(--ink)">${esc(AI.label())}</b><button class="btn sm ghost" data-ai>⚙ Trocar / configurar</button></div>
+    <div class="status" id="g-status" aria-live="polite"></div>
+    <div class="err" id="g-err" role="alert"></div>
+  </section>
+  <section class="card gen-box">
+    <span class="eyebrow">Clonar estrutura</span>
+    <h3 style="font-size:22px">Viu um quiz que converte? Reaproveite a estrutura.</h3>
+    <p class="muted" style="margin:0">Abra o quiz público, copie o texto das telas (perguntas, opções, oferta) e cole aqui. A IA mantém a lógica e reescreve tudo para o seu produto, sem copiar frases ou marca.</p>
+    <label class="f">Texto do quiz original<textarea id="g-clone" rows="7" placeholder="Cole aqui o texto das telas do quiz…"></textarea></label>
+    <button class="btn" id="g-clonego">Clonar para o meu produto</button>
+    <p class="tiny muted" style="margin:0;font-size:12px">O produto usado é o descrito ao lado.</p>
+  </section></div>
+  ${S.funnels.length ? `<h3 style="margin:28px 0 10px;font-size:18px">Recentes</h3>${funnelList(S.funnels.slice(0,3))}` : ''}`;
+}
+
+function stats(fid){
+  const ss = S.sessions.filter(s=>s.funil===fid), ls = S.leads.filter(l=>l.funil===fid);
+  const fin = ss.filter(s=>s.oferta).length, cta = ss.filter(s=>s.cta).length;
+  return {visitas:ss.length, leads:ls.length, oferta:fin, cta, conv: ss.length? Math.round(ls.length/ss.length*100):0};
+}
+function funnelList(list){
+  return `<div class="flist">${list.map(f=>{ const s=stats(f.id); return `
+    <div class="card frow">
+      <span class="dot" style="background:${esc(f.cor)}"></span>
+      <div style="min-width:0"><h3>${esc(f.nome)} ${f.abAtivo?'<span class="chip ab">A/B</span>':''}</h3>
+        <div class="kpis"><span><b>${steps(f,'A').length}</b> etapas</span><span><b>${s.visitas}</b> visitas</span><span><b>${s.leads}</b> leads</span><span><b>${s.conv}%</b> conversão</span></div></div>
+      <div class="row-actions">
+        <button class="btn sm" data-act="edit" data-id="${f.id}">Editar</button>
+        <button class="btn sm" data-act="play" data-id="${f.id}">Testar</button>
+        <button class="btn sm" data-act="share" data-id="${f.id}">Link</button>
+        <button class="btn sm" data-act="met" data-id="${f.id}">Métricas</button>
+      </div></div>`}).join('')}</div>`;
+}
+function vFunis(){
+  if (!S.funnels.length) return `<div class="card empty"><span class="eyebrow">Nenhum funil ainda</span><h2>Crie seu primeiro funil</h2>
+    <p class="muted" style="margin:0">Descreva o produto na aba Criar e a IA monta as etapas. Também é possível importar um funil exportado em JSON.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-go="criar">Criar funil</button><button class="btn" id="imp">Importar JSON</button></div></div>`;
+  return `<div class="ed-head"><h2>Meus funis</h2><span class="muted">${S.funnels.length} no total</span><div class="spacer"></div>
+    <button class="btn" id="imp">Importar JSON</button><button class="btn primary" data-go="criar">Novo funil</button></div>${funnelList(S.funnels)}`;
+}
+
+/* ---- Editor ---- */
+function vEditor(){
+  const f = curF();
+  if (!f) return `<div class="card empty"><h2>Nenhum funil selecionado</h2><p class="muted" style="margin:0">Gere um funil ou escolha um em Meus funis.</p><div><button class="btn primary" data-go="criar">Criar funil</button></div></div>`;
+  if (S.variant==='B' && !f.variantes.B) S.variant='A';
+  const st = steps(f); S.sel = Math.min(S.sel, st.length-1);
+  return `<div class="ed-head">
+    <select class="in" id="pick" style="width:auto;max-width:260px">${S.funnels.map(x=>`<option value="${x.id}" ${x.id===f.id?'selected':''}>${esc(x.nome)}</option>`).join('')}</select>
+    <div class="seg" role="group" aria-label="Versão">${['A','B'].map(v=>`<button data-var="${v}" aria-pressed="${S.variant===v}" ${v==='B'&&!f.variantes.B?'disabled title="Ative o teste A/B"':''}>Versão ${v}</button>`).join('')}</div>
+    <div class="spacer"></div>
+    <button class="btn" data-act="play" data-id="${f.id}">Testar quiz</button>
+    <button class="btn" data-act="share" data-id="${f.id}">Publicar link</button>
+    <button class="btn" id="exp">Exportar JSON</button>
+  </div>
+  <div class="subtabs">${[['etapas','Etapas'],['estrategia','Pesquisa e mecanismo'],['design','Marca e oferta'],['ab','Teste A/B']].map(([k,n])=>`<button data-sub="${k}" aria-current="${S.sub===k}">${n}</button>`).join('')}</div>
+  ${S.sub==='etapas'? edSteps(f,st) : S.sub==='estrategia'? edStrategy(f) : S.sub==='design'? edDesign(f) : edAB(f)}`;
+}
+function edSteps(f, st){
+  const s = st[S.sel];
+  return `<div class="editor">
+    <div class="card"><div class="steps" role="listbox" aria-label="Etapas">${st.map((x,i)=>`
+      <div class="step" role="option" tabindex="0" data-sel="${i}" aria-selected="${i===S.sel}">
+        <span class="n">${String(i+1).padStart(2,'0')}</span>
+        <span style="min-width:0"><span class="k">${TYPES[x.tipo].n}</span><span class="t">${esc(stepTitle(x))}</span></span>
+        <span class="mv"><button data-mv="${i}:-1" aria-label="Subir">▲</button><button data-mv="${i}:1" aria-label="Descer">▼</button></span>
+      </div>`).join('')}</div>
+      <div class="add-step"><select class="in" id="newtype" style="flex:1">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('')}</select><button class="btn sm" id="addstep">Adicionar</button></div>
+    </div>
+    <div class="card panel">${s? stepForm(s): ''}</div>
+    <div class="phone-col"><div class="phone"><div class="screen" id="pv"></div></div>
+      <span class="muted" style="font-size:12px">Prévia da etapa ${S.sel+1} de ${st.length}</span></div>
+  </div>`;
+}
+function field(key, label, val, ta){
+  return `<label class="f">${label}${ta?`<textarea data-k="${key}" rows="3">${esc(val)}</textarea>`:`<input data-k="${key}" value="${esc(val)}">`}</label>`;
+}
+function listField(key, label, arr){
+  return `<div class="f" style="display:grid;gap:6px"><span style="font-size:13px;font-weight:600;color:var(--muted)">${label}</span>
+    <div class="opts">${(arr||[]).map((o,i)=>`<div class="opt"><input class="in" data-l="${key}" data-i="${i}" value="${esc(o)}"><button class="btn sm ghost" data-ldel="${key}:${i}" aria-label="Remover">✕</button></div>`).join('')}</div>
+    <div><button class="btn sm" data-ladd="${key}">+ Adicionar</button></div></div>`;
+}
+function stepForm(s){
+  const head = `<div style="display:flex;align-items:center;gap:8px"><h3>${TYPES[s.tipo].n}</h3><div class="spacer"></div>
+    <button class="btn sm" id="aistep" title="Reescrever esta etapa com a IA ativa">✨ Melhorar com IA</button><button class="btn sm" id="dup">Duplicar</button><button class="btn sm danger" id="del">Excluir</button></div>`;
+  switch(s.tipo){
+    case 'intro': return head+field('titulo','Título',s.titulo,1)+field('subtitulo','Subtítulo',s.subtitulo,1)+field('botao','Texto do botão',s.botao);
+    case 'escolha': case 'multipla': return head+field('pergunta','Pergunta',s.pergunta,1)+field('ajuda','Texto de apoio',s.ajuda)+listField('opcoes','Opções',s.opcoes);
+    case 'info': return head+field('titulo','Título',s.titulo)+field('texto','Texto',s.texto,1);
+    case 'captura': return head+field('titulo','Título',s.titulo)+field('texto','Texto',s.texto,1)+
+      `<div class="f" style="display:grid;gap:6px"><span style="font-size:13px;font-weight:600;color:var(--muted)">Campos pedidos</span><div style="display:flex;gap:14px;flex-wrap:wrap">${['nome','email','whatsapp'].map(c=>`<label><input type="checkbox" data-campo="${c}" ${s.campos?.includes(c)?'checked':''}> ${c}</label>`).join('')}</div></div>`;
+    case 'carregando': return head+field('texto','Mensagem',s.texto);
+    case 'oferta': return head+field('titulo','Título',s.titulo)+field('dor','Dor (reconhecimento)',s.dor,1)+field('promessa','Promessa',s.promessa,1)+
+      listField('provas','Provas (use apenas provas reais)',s.provas)+listField('bonus','Bônus',s.bonus)+
+      `<div class="grid2">${field('preco_de','Preço “de” (R$)',s.preco_de)}${field('preco','Preço “por” (R$)',s.preco)}</div>`+
+      field('cta','Texto do botão',s.cta)+field('url','Link do checkout',s.url)+field('garantia','Garantia',s.garantia);
+  }
+}
+function edStrategy(f){
+  const p=f.pesquisa, m=f.mecanismo;
+  const lst=(k,n)=>`<div class="card panel">${listField('p.'+k,n,p[k])}</div>`;
+  return `<div style="display:grid;gap:14px">
+    <div class="card panel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="muted" style="font-size:14px;flex:1;min-width:220px">A IA preenche persona, dores, desejos, medos, objeções e o mecanismo único com base no produto e nas etapas atuais. O conteúdo atual será substituído.</span>
+      <button class="btn primary" id="aistrat">✨ Preencher com IA</button></div><div class="status" id="strat-st"></div><div class="err" id="strat-err"></div></div>
+    <div class="card panel"><span class="eyebrow">Mecanismo único</span>${field('m.nome','Nome do mecanismo',m.nome)}${field('m.explicacao','Como funciona',m.explicacao,1)}</div>
+    <div class="card panel">${field('p.persona','Persona',p.persona,1)}${field('produto','Descrição do produto',f.produto,1)}</div>
+    <div class="research">${lst('dores','Dores')}${lst('desejos','Desejos')}${lst('medos','Medos')}${lst('objecoes','Objeções')}</div></div>`;
+}
+function edDesign(f){
+  return `<div class="editor" style="grid-template-columns:minmax(0,1fr) 340px">
+    <div class="card panel">${field('nome','Nome interno do funil',f.nome)}${field('marca','Nome da marca exibido no quiz',f.marca)}
+      <label class="f">Cor da marca<div style="display:flex;gap:8px"><input type="color" data-k="cor" value="${esc(f.cor)}" style="width:56px;height:40px;padding:2px"><input data-k="cor" value="${esc(f.cor)}"></div></label>
+      <p class="muted" style="margin:0;font-size:13px">Os dados da oferta (preço, checkout, provas) ficam na etapa Oferta, em Etapas.</p>
+      <div><button class="btn danger" id="delf">Excluir este funil</button></div></div>
+    <div class="phone-col"><div class="phone"><div class="screen" id="pv"></div></div></div></div>`;
+}
+function edAB(f){
+  const has = !!f.variantes.B;
+  const sA = stats2(f.id,'A'), sB = stats2(f.id,'B');
+  return `<div class="card panel" style="max-width:760px">
+    <span class="eyebrow">Teste A/B</span>
+    <h3 style="font-size:20px">Divida o tráfego entre duas versões e compare a conversão.</h3>
+    <p class="muted" style="margin:0">Cada visitante recebe A ou B ao acaso (50/50) e fica sempre na mesma versão. Edite a versão B pelo seletor “Versão B” no topo.</p>
+    ${has?`<div class="tbl"><table class="t"><thead><tr><th>Versão</th><th>Visitas</th><th>Leads</th><th>Conversão</th><th>Cliques no checkout</th></tr></thead><tbody>
+      <tr><td>A</td><td class="num">${sA.v}</td><td class="num">${sA.l}</td><td class="num">${sA.c}%</td><td class="num">${sA.k}</td></tr>
+      <tr><td>B</td><td class="num">${sB.v}</td><td class="num">${sB.l}</td><td class="num">${sB.c}%</td><td class="num">${sB.k}</td></tr></tbody></table></div>
+      <p class="muted" style="margin:0;font-size:13px">${abVerdict(sA,sB)}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><label><input type="checkbox" id="abon" ${f.abAtivo?'checked':''}> Teste ativo (dividir tráfego)</label></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="abwin" data-w="A">Manter A e encerrar</button><button class="btn" id="abwinb" data-w="B">Promover B e encerrar</button></div>`
+    :`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="abmk">Criar versão B a partir da A</button>
+      <button class="btn" id="abai">Criar versão B com IA (novo ângulo)</button></div><div class="status" id="ab-st"></div><div class="err" id="ab-err"></div>`}
+  </div>`;
+}
+function stats2(fid,v){ const ss=S.sessions.filter(s=>s.funil===fid&&s.var===v), l=S.leads.filter(x=>x.funil===fid&&x.var===v).length;
+  return {v:ss.length,l,c:ss.length?Math.round(l/ss.length*1000)/10:0,k:ss.filter(s=>s.cta).length,n:ss.length}; }
+function abVerdict(a,b){
+  if (a.n<30||b.n<30) return `Amostra pequena: aguarde pelo menos 30 visitas por versão antes de decidir (A: ${a.n}, B: ${b.n}).`;
+  const p1=a.l/a.n, p2=b.l/b.n, p=(a.l+b.l)/(a.n+b.n), se=Math.sqrt(p*(1-p)*(1/a.n+1/b.n));
+  const z = se? (p2-p1)/se : 0;
+  if (Math.abs(z)<1.96) return `Diferença ainda não significativa (z = ${z.toFixed(2)}). Continue o teste.`;
+  return `Versão ${z>0?'B':'A'} converte mais, com 95% de confiança (z = ${z.toFixed(2)}).`;
+}
+
+/* ---- Métricas ---- */
+function vMetricas(){
+  if (!S.funnels.length) return `<div class="card empty"><h2>Sem métricas ainda</h2><p class="muted" style="margin:0">As métricas aparecem quando alguém responde a um funil.</p></div>`;
+  const f = S.funnels.find(x=>x.id===S.metricFunnel) || S.funnels[0]; S.metricFunnel=f.id;
+  const s = stats(f.id), st = steps(f,'A');
+  const vars = f.variantes.B ? ['A','B'] : ['A'];
+  const reach = v => st.map((_,i)=>S.sessions.filter(x=>x.funil===f.id&&(x.var||'A')===v&&(x.max??0)>=i).length);
+  const R = Object.fromEntries(vars.map(v=>[v,reach(v)]));
+  const max = Math.max(1,...vars.flatMap(v=>R[v]));
+  const W = Math.max(560, st.length*64), H=240, pl=36, pb=50, bw = (W-pl-10)/st.length;
+  const ticks = [0, Math.ceil(max/2), max];
+  const col = {A:'var(--teal)', B:'var(--accent)'};
+  const bars = vars.map((v,vi)=>R[v].map((n,i)=>{ const h=(n/max)*(H-pb-14); const w=(bw-12)/vars.length;
+    const x=pl+i*bw+6+vi*w, y=H-pb-h; return `<rect x="${x}" y="${y}" width="${w-2}" height="${h}" rx="3" fill="${col[v]}"><title>${v} · etapa ${i+1}: ${n}</title></rect><text x="${x+(w-2)/2}" y="${y-4}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="var(--f-mono)">${n}</text>`}).join('')).join('');
+  const labels = st.map((x,i)=>`<text x="${pl+i*bw+bw/2}" y="${H-pb+16}" text-anchor="middle" font-size="11" fill="var(--ink)" font-family="var(--f-mono)">${i+1}</text><text x="${pl+i*bw+bw/2}" y="${H-pb+30}" text-anchor="middle" font-size="9" fill="var(--muted)">${esc(TYPES[x.tipo].n.split(' ')[0])}</text>`).join('');
+  const grid = ticks.map(t=>{ const y=H-pb-(t/max)*(H-pb-14); return `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="${t?'3 3':''}"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--f-mono)">${t}</text>`}).join('');
+  // pior queda
+  let worst=null; const ra=R.A; for(let i=1;i<ra.length;i++){ if(ra[i-1]>0){ const d=1-ra[i]/ra[i-1]; if(!worst||d>worst.d) worst={i,d}; } }
+  return `<div class="ed-head"><h2>Métricas</h2>
+    <select class="in" id="mpick" style="width:auto;max-width:280px">${S.funnels.map(x=>`<option value="${x.id}" ${x.id===f.id?'selected':''}>${esc(x.nome)}</option>`).join('')}</select></div>
+  <div class="mgrid">
+    <div class="card kpi"><div class="v">${s.visitas}</div><div class="l">Visitas iniciadas</div></div>
+    <div class="card kpi"><div class="v">${s.leads}</div><div class="l">Leads capturados</div></div>
+    <div class="card kpi"><div class="v">${s.conv}%</div><div class="l">Visita → lead</div></div>
+    <div class="card kpi"><div class="v">${s.oferta}</div><div class="l">Chegaram à oferta</div></div>
+    <div class="card kpi"><div class="v">${s.cta}</div><div class="l">Cliques no checkout</div></div>
+  </div>
+  <div class="card chart"><div class="legend"><span class="eyebrow" style="margin-right:auto">Visitantes por etapa</span>${vars.map(v=>`<span><i style="background:${col[v]}"></i>Versão ${v}</span>`).join('')}</div>
+    ${s.visitas? `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Visitantes que chegaram a cada etapa">${grid}${bars}${labels}</svg>
+    ${worst&&worst.d>0?`<p style="margin:8px 0 0">Maior abandono: da etapa ${worst.i} para a ${worst.i+1} (<b>${Math.round(worst.d*100)}%</b> saem) — “${esc(stepTitle(st[worst.i]))}”.</p>`:''}`
+    : `<p class="muted">Nenhuma visita registrada. Use “Testar” ou compartilhe o link do quiz.</p>`}
+  </div>`;
+}
+
+/* ---- Leads ---- */
+function vLeads(){
+  const fid = S.metricFunnel;
+  const list = S.leads.filter(l=>!fid || fid==='*' || l.funil===fid).sort((a,b)=>b.ts-a.ts);
+  const name = id => S.funnels.find(f=>f.id===id)?.nome || '—';
+  return `<div class="ed-head"><h2>Leads</h2>
+    <select class="in" id="lpick" style="width:auto;max-width:280px"><option value="*">Todos os funis</option>${S.funnels.map(x=>`<option value="${x.id}" ${x.id===fid?'selected':''}>${esc(x.nome)}</option>`).join('')}</select>
+    <div class="spacer"></div><button class="btn primary" id="csv" ${list.length?'':'disabled'}>Exportar CSV</button></div>
+  ${list.length? `<div class="card tbl"><table class="t"><thead><tr><th>Data</th><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Funil</th><th>Versão</th><th>Respostas</th></tr></thead><tbody>
+    ${list.map(l=>`<tr><td class="num">${new Date(l.ts).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</td><td>${esc(l.nome)}</td><td>${esc(l.email)}</td><td>${esc(l.whatsapp)}</td><td>${esc(name(l.funil))}</td><td>${esc(l.var)}</td><td style="font-size:13px;color:var(--muted)">${esc((l.respostas||[]).join(' · '))}</td></tr>`).join('')}
+  </tbody></table></div>` : `<div class="card empty"><h3>Nenhum lead ainda</h3><p class="muted" style="margin:0">Os leads entram aqui quando alguém preenche a etapa de captura.</p></div>`}`;
+}
+
+/* ============ Renderização do quiz (prévia e execução) ============ */
+function quizHTML(f, st, i, ans, opts={}){
+  const s = st[i]; if(!s) return '';
+  const pct = Math.round((i+1)/st.length*100);
+  const a = ans?.[i];
+  let body='';
+  switch(s.tipo){
+    case 'intro': body=`<h2>${esc(s.titulo)}</h2><p>${esc(s.subtitulo)}</p>${f.mecanismo?.nome?`<div class="mech">${esc(f.mecanismo.nome)}</div>`:''}<button class="cta" data-next>${esc(s.botao||'Começar')}</button>`; break;
+    case 'escolha': body=`<h2>${esc(s.pergunta)}</h2>${s.ajuda?`<p>${esc(s.ajuda)}</p>`:''}${s.opcoes.map((o,k)=>`<button class="o ${a===k?'on':''}" data-pick="${k}">${esc(o)}</button>`).join('')}`; break;
+    case 'multipla': body=`<h2>${esc(s.pergunta)}</h2>${s.ajuda?`<p>${esc(s.ajuda)}</p>`:''}${s.opcoes.map((o,k)=>`<button class="o ${(a||[]).includes(k)?'on':''}" data-multi="${k}">${esc(o)}</button>`).join('')}<button class="cta" data-next ${(a||[]).length?'':'disabled'}>Continuar</button>`; break;
+    case 'info': body=`<h2>${esc(s.titulo)}</h2><p>${esc(s.texto)}</p><button class="cta" data-next>Continuar</button>`; break;
+    case 'captura': body=`<h2>${esc(s.titulo)}</h2><p>${esc(s.texto)}</p><form data-cap style="display:grid;gap:10px">
+      ${(s.campos||[]).map(c=>`<input name="${c}" ${c==='email'?'type="email"':c==='whatsapp'?'type="tel" inputmode="tel"':''} placeholder="${c==='nome'?'Seu nome':c==='email'?'Seu melhor e-mail':'WhatsApp com DDD'}" required autocomplete="${c==='nome'?'name':c==='email'?'email':'tel'}">`).join('')}
+      <button class="cta" type="submit">Ver meu resultado</button><span class="tiny">Seus dados são usados só para enviar o resultado.</span></form>`; break;
+    case 'carregando': body=`<div class="spin"></div><p style="text-align:center">${esc(s.texto)}</p>`; break;
+    case 'oferta': body=`<span class="tiny" style="text-transform:uppercase;letter-spacing:.08em;color:var(--b);font-weight:700">Seu resultado</span><h2>${esc(s.titulo)}</h2>
+      ${s.dor?`<p>${esc(s.dor)}</p>`:''}${s.promessa?`<div class="mech">${esc(s.promessa)}</div>`:''}
+      ${(s.provas||[]).length?`<ul class="proof">${s.provas.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`:''}
+      ${(s.bonus||[]).length?`<p><b>Bônus:</b> ${s.bonus.map(esc).join(' · ')}</p>`:''}
+      <div class="price">${s.preco_de?`<s>R$ ${esc(s.preco_de)}</s>`:''}<b>R$ ${esc(s.preco)}</b></div>
+      ${opts.live && s.url ? `<a class="cta" style="text-align:center;text-decoration:none" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener" data-ctalink>${esc(s.cta)}</a>` : `<button class="cta" data-cta>${esc(s.cta)}</button>`}
+      ${s.garantia?`<span class="tiny" style="text-align:center">${esc(s.garantia)}</span>`:''}`; break;
+  }
+  return `<div class="qz" style="--b:${esc(f.cor)}"><div class="bar"><i style="width:${pct}%"></i></div><div class="brand">${esc(f.marca)}</div><div class="body">${body}</div></div>`;
+}
+const safeUrl = u => /^https?:\/\//i.test(u) ? u : '#';
+
+function renderPreview(){
+  const pv = $('#pv'); const f = curF(); if(!pv||!f) return;
+  const st = steps(f); const i = S.sub==='design' ? st.findIndex(s=>s.tipo==='oferta') : S.sel;
+  pv.innerHTML = quizHTML(f, st, Math.max(0,i), {});
+}
+
+/* Execução real do quiz: grava sessão e lead */
+function play(fid, isPublic){
+  const f = S.funnels.find(x=>x.id===fid); if(!f) return;
+  let v = 'A';
+  if (f.abAtivo && f.variantes.B){ const k='var_'+fid; v = (()=>{ try{ return sessionStorage.getItem(k) }catch{ return null } })() || (Math.random()<.5?'A':'B'); try{ sessionStorage.setItem(k,v) }catch{} }
+  const st = steps(f, v); const ans = {}; let i = 0;
+  const sess = {id: uid('s'), funil: fid, var: v, max: 0, oferta: false, cta: false, inicio: Date.now(), teste: !isPublic};
+  putSession(sess);
+  const ov = $('#overlay');
+  ov.innerHTML = `<div class="play" id="playbox"></div><button class="play-close" id="pclose">${isPublic?'Fechar':'Sair do teste'}</button>`;
+  $('#pclose').onclick = ()=>{ ov.innerHTML=''; if(location.hash) history.replaceState(null,'',location.pathname); render(); };
+  const box = $('#playbox');
+  function draw(){
+    box.innerHTML = quizHTML(f, st, i, ans, {live:true});
+    if (i > sess.max){ sess.max = i; if (st[i].tipo==='oferta') sess.oferta = true; putSession(sess); }
+    if (st[i].tipo==='carregando') setTimeout(()=>{ if(i<st.length-1){ i++; draw(); } }, 2200);
+  }
+  function next(){ if (i < st.length-1){ i++; draw(); box.scrollTop=0; } }
+  box.onclick = e => {
+    const t = e.target.closest('button,a'); if(!t) return;
+    if (t.hasAttribute('data-next')) next();
+    else if (t.dataset.pick!=null){ ans[i]=+t.dataset.pick; draw(); setTimeout(next, 220); }
+    else if (t.dataset.multi!=null){ const k=+t.dataset.multi; const arr=ans[i]||[]; ans[i]= arr.includes(k)? arr.filter(x=>x!==k):[...arr,k]; draw(); }
+    else if (t.hasAttribute('data-cta') || t.hasAttribute('data-ctalink')){ sess.cta=true; putSession(sess); if(t.hasAttribute('data-cta')) toast(st[i].url? 'Abrindo checkout…' : 'Configure o link do checkout na etapa Oferta.'); }
+  };
+  box.onsubmit = async e => {
+    e.preventDefault(); const fd = new FormData(e.target);
+    const respostas = st.map((s,k)=> s.opcoes && ans[k]!=null ? (Array.isArray(ans[k])? ans[k].map(x=>s.opcoes[x]).join(' + ') : s.opcoes[ans[k]]) : null).filter(Boolean);
+    const lead = {id: uid('l'), funil: fid, var: v, nome: fd.get('nome')||'', email: fd.get('email')||'', whatsapp: fd.get('whatsapp')||'', respostas, ts: Date.now(), teste: !isPublic};
+    const ok = await addLead(lead);
+    if (!ok) toast('Não foi possível registrar seus dados agora.');
+    next();
+  };
+  draw();
+}
+
+function shareModal(f){
+  const tok = 'play-'+f.id;
+  modal(`<h3>Publicar link do quiz</h3>
+    <p class="muted" style="margin:0">Este app é um artifact do claude.ai. Para abrir o quiz direto em tela cheia, use o link do artifact com o final abaixo:</p>
+    <code class="k" id="tok">#${tok}</code>
+    <p class="muted" style="margin:0;font-size:13px">Compartilhe o artifact pelo menu Compartilhar do claude.ai. Para que as respostas sejam gravadas, quem responde precisa ter acesso de Colaborador (Contributor) ou superior; com acesso só de leitura o quiz funciona, mas visitas e leads não são salvos.</p>
+    <div style="display:flex;gap:8px"><button class="btn primary" id="cp">Copiar final do link</button><button class="btn" data-close>Fechar</button></div>`);
+  $('#cp').onclick = ()=>{ navigator.clipboard.writeText('#'+tok).then(()=>toast('Copiado'), ()=>{ const r=document.createRange(); r.selectNodeContents($('#tok')); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Selecionado: use Ctrl+C'); }); };
+}
+function modal(html, cls=''){
+  const ov=$('#overlay'); ov.innerHTML=`<div class="modal-bg"><div class="card modal ${cls}" role="dialog" aria-modal="true">${html}</div></div>`;
+  ov.querySelector('.modal-bg').onclick = e=>{ if(e.target.classList.contains('modal-bg')||e.target.hasAttribute('data-close')) ov.innerHTML=''; };
+}
+function checkHash(){
+  const m = location.hash.match(/^#play-([a-z0-9]+)$/i);
+  if (m && S.funnels.find(f=>f.id===m[1]) && !$('#playbox')) play(m[1], true);
+}
+
+/* ============ Eventos ============ */
+function bindView(){
+  const app=$('#app'); const f=curF();
+  app.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  app.querySelectorAll('[data-ai]').forEach(b=>b.onclick=aiModal);
+  app.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id, ff=S.funnels.find(x=>x.id===id);
+    if(b.dataset.act==='edit'){ S.cur=id; S.sel=0; S.variant='A'; S.sub='etapas'; go('editor'); }
+    if(b.dataset.act==='play') play(id,false);
+    if(b.dataset.act==='share') shareModal(ff);
+    if(b.dataset.act==='met'){ S.metricFunnel=id; go('metricas'); }
+  });
+  if (S.view==='criar'){
+    $('#g-go').onclick=()=>generate('gen'); $('#g-clonego').onclick=()=>generate('clone'); $('#g-blank').onclick=startBlank;
+    $('#g-prod').oninput=e=>LS.set('draft', e.target.value);
+  }
+  const imp=$('#imp'); if(imp) imp.onclick=()=>{ modal(`<h3>Importar funil (JSON)</h3><textarea class="in" id="impt" rows="10" placeholder="Cole o JSON exportado"></textarea><div class="err" id="imperr"></div><div style="display:flex;gap:8px"><button class="btn primary" id="impgo">Importar</button><button class="btn" data-close>Cancelar</button></div>`);
+    $('#impgo').onclick=()=>{ try{ const o=JSON.parse($('#impt').value); if(!o.variantes?.A) throw 0; o.id=uid('f'); o.atualizado=Date.now(); upsertLocalFunnel(o); $('#overlay').innerHTML=''; render(); toast('Funil importado'); }catch{ $('#imperr').textContent='JSON inválido: use um arquivo exportado pelo Quizário.'; } }; };
+  const mp=$('#mpick'); if(mp) mp.onchange=e=>{ S.metricFunnel=e.target.value; render(); };
+  const lp=$('#lpick'); if(lp) lp.onchange=e=>{ S.metricFunnel=e.target.value; render(); };
+  const csv=$('#csv'); if(csv) csv.onclick=exportCSV;
+  if (S.view!=='editor' || !f) return;
+
+  $('#pick').onchange=e=>{ S.cur=e.target.value; S.sel=0; S.variant='A'; render(); };
+  app.querySelectorAll('[data-var]').forEach(b=>b.onclick=()=>{ S.variant=b.dataset.var; render(); });
+  app.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{ S.sub=b.dataset.sub; render(); });
+  $('#exp').onclick=()=>{ const json=JSON.stringify(f,null,2);
+    if (S.downloads) S.downloads.save({filename:(f.nome||'funil').replace(/[^\w-]+/g,'_')+'.json', data:json}).catch(()=>{});
+    else modal(`<h3>JSON do funil</h3><textarea class="in" rows="12" readonly>${esc(json)}</textarea><div><button class="btn" data-close>Fechar</button></div>`); };
+  const st = steps(f); const s = st[S.sel];
+  const commit = (rerenderList)=>{ saveFunnel(f); renderPreview(); if(rerenderList){ const el=app.querySelector(`.step[data-sel="${S.sel}"] .t`); if(el) el.textContent=stepTitle(s); } };
+
+  if (S.sub==='etapas'){
+    app.querySelectorAll('.step').forEach(el=>{ el.onclick=e=>{ if(e.target.closest('[data-mv]')) return; S.sel=+el.dataset.sel; render(); }; el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); S.sel=+el.dataset.sel; render(); } }; });
+    app.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const [i,d]=b.dataset.mv.split(':').map(Number); const j=i+d; if(j<0||j>=st.length) return; [st[i],st[j]]=[st[j],st[i]]; S.sel=j; saveFunnel(f); render(); });
+    $('#addstep').onclick=()=>{ st.splice(S.sel+1,0,blank($('#newtype').value)); S.sel++; saveFunnel(f); render(); };
+    if (s){
+      $('#aistep').onclick=()=>aiStep(f, s);
+      $('#dup').onclick=()=>{ st.splice(S.sel+1,0,clone(s)); S.sel++; saveFunnel(f); render(); };
+      $('#del').onclick=()=>{ if(st.length<=1) return toast('O funil precisa de pelo menos uma etapa.'); st.splice(S.sel,1); S.sel=Math.max(0,S.sel-1); saveFunnel(f); render(); };
+      app.querySelectorAll('.panel [data-k]').forEach(el=>el.oninput=()=>{ s[el.dataset.k]=el.value; commit(true); });
+      app.querySelectorAll('.panel [data-campo]').forEach(el=>el.onchange=()=>{ s.campos=[...app.querySelectorAll('[data-campo]:checked')].map(x=>x.dataset.campo); commit(); });
+      bindLists(s, commit);
+    }
+    renderPreview();
+  }
+  if (S.sub==='estrategia'){
+    app.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{ const k=el.dataset.k; if(k.startsWith('m.')) f.mecanismo[k.slice(2)]=el.value; else if(k.startsWith('p.')) f.pesquisa[k.slice(2)]=el.value; else f[k]=el.value; saveFunnel(f); });
+    bindLists(f.pesquisa, ()=>saveFunnel(f), 'p.');
+    $('#aistrat').onclick=()=>aiStrategy(f);
+  }
+  if (S.sub==='design'){
+    app.querySelectorAll('[data-k]').forEach(el=>el.oninput=()=>{ const k=el.dataset.k; if(k==='cor' && !/^#[0-9a-f]{6}$/i.test(el.value)) return; f[k]=el.value; if(k==='cor') app.querySelectorAll('[data-k="cor"]').forEach(x=>{ if(x!==el) x.value=el.value; }); saveFunnel(f); renderPreview(); });
+    $('#delf').onclick=()=>modal(`<h3>Excluir “${esc(f.nome)}”?</h3><p class="muted" style="margin:0">O funil some para todos. Visitas e leads já registrados continuam na aba Leads.</p><div style="display:flex;gap:8px"><button class="btn danger" id="delyes">Excluir funil</button><button class="btn" data-close>Cancelar</button></div>`) || ($('#delyes').onclick=()=>{ $('#overlay').innerHTML=''; const id=f.id; S.cur=S.funnels.find(x=>x.id!==id)?.id||null; removeFunnel(id); toast('Funil excluído'); });
+    renderPreview();
+  }
+  if (S.sub==='ab'){
+    const mk=$('#abmk'); if(mk) mk.onclick=()=>{ f.variantes.B=clone(f.variantes.A); f.abAtivo=true; saveFunnel(f); S.variant='B'; S.sub='etapas'; render(); toast('Versão B criada. Agora edite o que quer testar.'); };
+    const ai=$('#abai'); if(ai) ai.onclick=()=>abWithAI(f);
+    const on=$('#abon'); if(on) on.onchange=()=>{ f.abAtivo=on.checked; saveFunnel(f); };
+    app.querySelectorAll('#abwin,#abwinb').forEach(b=>b.onclick=()=>{ if(b.dataset.w==='B') f.variantes.A=f.variantes.B; f.variantes.B=null; f.abAtivo=false; S.variant='A'; saveFunnel(f); render(); toast(`Versão ${b.dataset.w} mantida`); });
+  }
+}
+function bindLists(obj, commit, prefix=''){
+  const app=$('#app');
+  app.querySelectorAll('[data-l]').forEach(el=>el.oninput=()=>{ const k=el.dataset.l.replace(prefix,''); obj[k][+el.dataset.i]=el.value; commit(); });
+  app.querySelectorAll('[data-ldel]').forEach(b=>b.onclick=()=>{ const [k,i]=b.dataset.ldel.split(':'); obj[k.replace(prefix,'')].splice(+i,1); commit(); render(); });
+  app.querySelectorAll('[data-ladd]').forEach(b=>b.onclick=()=>{ const k=b.dataset.ladd.replace(prefix,''); (obj[k] ||= []).push(''); commit(); render(); const ins=app.querySelectorAll(`[data-l="${b.dataset.ladd}"]`); ins[ins.length-1]?.focus(); });
+}
+async function abWithAI(f){
+  const st=$('#ab-st'), er=$('#ab-err'); er.textContent='';
+  if (!AI.available()){ er.textContent='Nenhuma IA configurada. Informe uma chave em "⚙ IA".'; aiModal(); return; }
+  st.textContent='Criando versão B com outro ângulo…'; const btn=$('#abai'); if(btn) btn.disabled=true;
+  try{
+    const raw = await AI.json(`Este é um funil de quiz (versão A) em JSON. Crie uma versão B para teste A/B: mantenha os mesmos tipos de etapa e o mesmo número de etapas, mas mude o ângulo de abertura, a ordem ou a formulação das perguntas e a headline da oferta. Mantenha preço, link e garantia. Não invente depoimentos ou números.
+Responda SOMENTE com JSON no formato {"etapas":[ ...etapas no mesmo formato da versão A... ]}.
+VERSÃO A:\n${JSON.stringify(f.variantes.A)}`);
+    const A = f.variantes.A;
+    // preserva preço, link, garantia e campos de captura da versão A
+    const keepFrom = tipo => A.find(x=>x.tipo===tipo) || {};
+    const arr = (Array.isArray(raw)?raw:raw?.etapas||[]).filter(e=>TYPES[e?.tipo]).map(e=>({...blank(e.tipo),...e}));
+    if (!arr.length) throw new Error('resposta sem etapas');
+    arr.forEach(e=>{ if(e.tipo==='oferta'){ const o=keepFrom('oferta'); ['preco','preco_de','url','garantia'].forEach(k=>{ if(o[k]!=null) e[k]=o[k]; }); } if(e.tipo==='captura'){ const c=keepFrom('captura'); if(c.campos) e.campos=c.campos; } });
+    f.variantes.B = arr; f.abAtivo = true; saveFunnel(f); S.variant='B'; S.sub='etapas'; render(); toast('Versão B criada com IA');
+  }catch(e){ st.textContent=''; er.textContent = 'Não foi possível criar a versão B: '+aiErr(e); if(btn) btn.disabled=false; }
+}
+
+/* Reescreve uma etapa com IA, mantendo o tipo e os dados comerciais */
+function aiStep(f, s){
+  modal(`<h3>✨ Melhorar etapa com IA</h3>
+    <p class="muted" style="margin:0;font-size:13px">Etapa: <b>${esc(TYPES[s.tipo].n)}</b> · IA: <b>${esc(AI.label())}</b> <button class="btn sm ghost" data-ai2>trocar</button></p>
+    <label class="f">O que mudar (opcional)<textarea class="in" id="ais-i" rows="3" placeholder="Ex.: mais curto; tom mais urgente; opções mais específicas para o público"></textarea></label>
+    <div class="status" id="ais-st"></div><div class="err" id="ais-err"></div>
+    <div style="display:flex;gap:8px"><button class="btn primary" id="ais-go">Reescrever</button><button class="btn" data-close>Cancelar</button></div>`);
+  $('[data-ai2]').onclick = aiModal;
+  $('#ais-go').onclick = async () => {
+    const er=$('#ais-err'), st=$('#ais-st'), b=$('#ais-go'); er.textContent='';
+    if (!AI.available()){ er.textContent='Nenhuma IA configurada.'; return aiModal(); }
+    b.disabled=true; st.textContent='Reescrevendo…';
+    try{
+      const raw = await AI.json(`Reescreva UMA etapa de um funil de quiz em português do Brasil, para celular (textos curtos; perguntas com até 90 caracteres).
+PRODUTO: ${f.produto||f.nome}
+MARCA: ${f.marca}
+PERSONA: ${f.pesquisa?.persona||'(não informada)'}
+MECANISMO ÚNICO: ${f.mecanismo?.nome||''} ${f.mecanismo?.explicacao||''}
+INSTRUÇÃO DO USUÁRIO: ${$('#ais-i').value.trim() || 'deixe mais claro, específico e persuasivo, sem exageros'}
+Regras: mantenha o mesmo "tipo" e os mesmos campos. Não invente depoimentos, números ou resultados; use marcadores entre colchetes, ex.: "[depoimento real]". Não faça promessas de saúde, renda ou resultado garantido. Em "oferta", mantenha preço, preço "de", link e garantia.
+ETAPA ATUAL (JSON):
+${JSON.stringify(s)}
+Responda SOMENTE com o JSON da etapa reescrita (um objeto).`);
+      const o = Array.isArray(raw) ? raw[0] : (raw?.etapa || raw);
+      if (!o || typeof o!=='object') throw new Error('resposta sem etapa');
+      const allowed = Object.keys(blank(s.tipo)).filter(k=>!['tipo','preco','preco_de','url','garantia','campos'].includes(k));
+      allowed.forEach(k=>{ if (o[k]==null) return; s[k] = Array.isArray(blank(s.tipo)[k]) ? (Array.isArray(o[k])?o[k].map(String).filter(x=>x.trim()):s[k]) : String(o[k]); });
+      saveFunnel(f); $('#overlay').innerHTML=''; render(); toast('Etapa reescrita');
+    }catch(e){ st.textContent=''; er.textContent='Não foi possível reescrever: '+aiErr(e); b.disabled=false; }
+  };
+}
+
+/* Preenche pesquisa de público e mecanismo único com IA */
+async function aiStrategy(f){
+  const er=$('#strat-err'), st=$('#strat-st'), b=$('#aistrat'); er.textContent='';
+  if (!AI.available()){ er.textContent='Nenhuma IA configurada. Informe uma chave em "⚙ IA".'; return aiModal(); }
+  b.disabled=true; st.textContent='Pesquisando público e mecanismo…';
+  try{
+    const resumo = steps(f,'A').map(x=>`${x.tipo}: ${stepTitle(x)}${x.opcoes?' ['+x.opcoes.join(' | ')+']':''}`).join('\n');
+    const raw = await AI.json(`Você é um estrategista de funis de quiz para o mercado brasileiro. Faça a pesquisa de público e defina o mecanismo único (o ângulo que diferencia o produto, na linguagem do mercado).
+PRODUTO: ${f.produto||f.nome}
+MARCA: ${f.marca}
+PERSONA ATUAL (se houver): ${f.pesquisa?.persona||''}
+ETAPAS ATUAIS DO QUIZ:
+${resumo}
+Regras: português do Brasil; itens curtos e concretos (3 a 6 por lista); não invente estatísticas, estudos ou depoimentos.
+Responda SOMENTE com JSON: {"pesquisa":{"persona":"…","dores":["…"],"desejos":["…"],"medos":["…"],"objecoes":["…"]},"mecanismo":{"nome":"…","explicacao":"…"}}`);
+    const p = raw?.pesquisa || {}, m = raw?.mecanismo || {};
+    const arr = v => Array.isArray(v) ? v.map(String).filter(x=>x.trim()) : [];
+    f.pesquisa = {persona: String(p.persona||f.pesquisa?.persona||''), dores:arr(p.dores), desejos:arr(p.desejos), medos:arr(p.medos), objecoes:arr(p.objecoes)};
+    f.mecanismo = {nome: String(m.nome||''), explicacao: String(m.explicacao||'')};
+    saveFunnel(f); render(); toast('Pesquisa e mecanismo preenchidos');
+  }catch(e){ st.textContent=''; er.textContent='Não foi possível preencher: '+aiErr(e); b.disabled=false; }
+}
+function exportCSV(){
+  const fid=S.metricFunnel; const list=S.leads.filter(l=>!fid||fid==='*'||l.funil===fid);
+  const name=id=>S.funnels.find(f=>f.id===id)?.nome||'';
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const csv='\ufeff'+['data;nome;email;whatsapp;funil;versao;respostas;teste', ...list.map(l=>[new Date(l.ts).toLocaleString('pt-BR'),l.nome,l.email,l.whatsapp,name(l.funil),l.var,(l.respostas||[]).join(' | '),l.teste?'sim':'nao'].map(q).join(';'))].join('\n');
+  if (S.downloads) S.downloads.save({filename:'leads.csv', data:csv}).catch(e=>{ if(e?.code!=='declined') toast('Não foi possível baixar.'); });
+  else modal(`<h3>Leads em CSV</h3><p class="muted" style="margin:0">Copie e cole no Excel.</p><textarea class="in" rows="10" readonly>${esc(csv)}</textarea><div><button class="btn" data-close>Fechar</button></div>`);
+}
+
+$('#tabs').onclick = e=>{ const b=e.target.closest('button'); if(b) go(b.dataset.v); };
+$('#aibtn').onclick = aiModal; updateAiLabel();
+window.addEventListener('hashchange', checkHash);
+boot();
+</script>
+
+</body></html>
